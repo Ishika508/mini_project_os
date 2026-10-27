@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TrafficOS — OS Algorithm Visualizer (Smart Traffic Management System)</title>
+<meta name="description" content="Interactive Operating Systems visualizer: CPU scheduling, producer–consumer synchronization, Banker's algorithm and memory management, integrated in a Smart Traffic Management System simulation.">
+<script>
+  /* apply saved / system theme before first paint (no flash) */
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('trafficos-theme'); } catch (e) {}
+    if (!t) t = (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="blobs" aria-hidden="true"><i></i><i></i><i></i></div>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo" aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="20" rx="3"/><circle cx="12" cy="7" r="1.4" fill="#fff"/><circle cx="12" cy="12" r="1.4" fill="#fff"/><circle cx="12" cy="17" r="1.4" fill="#fff"/></svg>
+    </div>
+    <div>TrafficOS<small>OS Algorithm Visualizer</small></div>
+  </div>
+  <nav class="tabs" id="nav" role="tablist" aria-label="Modules">
+    <button class="tabbtn active" data-tab="home">Overview</button>
+    <button class="tabbtn" data-tab="live">Live City</button>
+    <button class="tabbtn" data-tab="cpu">CPU Scheduling</button>
+    <button class="tabbtn" data-tab="pc">Producer–Consumer</button>
+    <button class="tabbtn" data-tab="bankers">Banker's</button>
+    <button class="tabbtn" data-tab="memory">Memory</button>
+    <button class="tabbtn" data-tab="theory">Theory</button>
+  </nav>
+  <button class="iconbtn" id="themeBtn" title="Toggle light / dark theme" aria-label="Toggle theme">
+    <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+  </button>
+</header>
+
+<main>
+<!-- ============================== OVERVIEW ============================== -->
+<section class="tab active" id="tab-home">
+  <div class="hero">
+    <span class="tag">Operating Systems · Assignment 3 &amp; Practical 9</span>
+    <h1 style="margin-top:12px">Smart Traffic Management System<br><span class="grad-text">four OS mechanisms, one city.</span></h1>
+    <p>An intelligent traffic-control centre collects data from road sensors and cameras, queues it for analysis, and runs signal-control tasks that compete for CPU time, memory and shared channels. This visualizer simulates the whole pipeline and lets you explore each OS algorithm on its own.</p>
+    <div class="row" style="margin-top:16px">
+      <button class="btn primary" data-go="live">▶ Launch live simulation</button>
+      <button class="btn" data-go="theory">Read the theory</button>
+      <span class="chip info">Ishika Burde · UID 24003146 · Batch B1</span>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <div class="card-h">How the four modules cooperate in the city</div>
+    <div style="overflow-x:auto"><div style="min-width:820px">
+      <svg class="flowsvg" viewBox="0 0 1040 180" role="img" aria-label="Pipeline: sensors to buffer to consumers to admission to CPU to signals">
+        <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--accent)"/></marker></defs>
+        <g>
+          <rect class="box" x="4" y="40" width="150" height="86" rx="14"/><text class="t1" x="79" y="74" text-anchor="middle">Sensors &amp; Cameras</text><text class="t2" x="79" y="92" text-anchor="middle">PRODUCERS</text><text class="t2" x="79" y="108" text-anchor="middle">traffic data packets</text>
+          <rect class="box" x="188" y="40" width="150" height="86" rx="14"/><text class="t1" x="263" y="74" text-anchor="middle">Bounded Buffer</text><text class="t2" x="263" y="92" text-anchor="middle">empty · full · mutex</text><text class="t2" x="263" y="108" text-anchor="middle">PROCESS SYNC</text>
+          <rect class="box" x="372" y="40" width="150" height="86" rx="14"/><text class="t1" x="447" y="74" text-anchor="middle">Analytics Workers</text><text class="t2" x="447" y="92" text-anchor="middle">CONSUMERS</text><text class="t2" x="447" y="108" text-anchor="middle">become OS tasks</text>
+          <rect class="box" x="556" y="40" width="150" height="86" rx="14"/><text class="t1" x="631" y="74" text-anchor="middle">Admission</text><text class="t2" x="631" y="92" text-anchor="middle">Memory (First/Best/Worst)</text><text class="t2" x="631" y="108" text-anchor="middle">+ Banker's safety check</text>
+          <rect class="box" x="740" y="40" width="130" height="86" rx="14"/><text class="t1" x="805" y="74" text-anchor="middle">CPU Scheduler</text><text class="t2" x="805" y="92" text-anchor="middle">FCFS · SJF · SRTF</text><text class="t2" x="805" y="108" text-anchor="middle">Priority · RR</text>
+          <rect class="box" x="904" y="40" width="130" height="86" rx="14"/><text class="t1" x="969" y="74" text-anchor="middle">Signal Control</text><text class="t2" x="969" y="92" text-anchor="middle">green times,</text><text class="t2" x="969" y="108" text-anchor="middle">emergency preemption</text>
+        </g>
+        <g stroke="var(--accent)" stroke-width="2.2" fill="none" marker-end="url(#ah)">
+          <path class="pipe" d="M156 83H184"/><path class="pipe" d="M340 83H368"/><path class="pipe" d="M524 83H552"/><path class="pipe" d="M708 83H736"/><path class="pipe" d="M872 83H900"/>
+        </g>
+        <path class="pipe" d="M969 128 C 969 172, 79 172, 79 130" stroke="var(--accent-2)" stroke-width="2" fill="none" marker-end="url(#ah)"/>
+        <text class="t2" x="520" y="164" text-anchor="middle">feedback: signal timings change the traffic the sensors see next</text>
+      </svg>
+    </div></div>
+  </div>
+
+  <div class="grid g4" style="margin-top:18px">
+    <div class="card hover mod-card" data-go="cpu"><span class="num">1</span><h3><span class="ic" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">CPU</span>CPU Scheduling</h3><p class="muted small">Signal-control, analytics and emergency tasks compete for the processor. Compare FCFS, SJF, SRTF, Priority and Round Robin with live Gantt charts, waiting and turnaround times.</p></div>
+    <div class="card hover mod-card" data-go="pc"><span class="num">2</span><h3><span class="ic" style="background:linear-gradient(135deg,#0891b2,#22d3ee)">P/C</span>Producer–Consumer</h3><p class="muted small">Sensors produce readings, analytics workers consume them. Watch semaphores guard a bounded buffer — and see what a wrong lock order does.</p></div>
+    <div class="card hover mod-card" data-go="bankers"><span class="num">3</span><h3><span class="ic" style="background:linear-gradient(135deg,#f59e0b,#ef4444)">BA</span>Banker's Algorithm</h3><p class="muted small">Shared channels, camera decoders and signal links are granted only if the system stays in a safe state. Edit matrices, step through the safety algorithm, test requests.</p></div>
+    <div class="card hover mod-card" data-go="memory"><span class="num">4</span><h3><span class="ic" style="background:linear-gradient(135deg,#16a34a,#4ade80)">MEM</span>Memory Management</h3><p class="muted small">Allocate buffers and frame caches with First, Best or Worst Fit in fixed or variable partitions. Visualize holes and analyse fragmentation.</p></div>
+  </div>
+
+  <div class="grid g2" style="margin-top:18px">
+    <div class="card">
+      <div class="card-h">Problem statement (Problem 3)</div>
+      <p class="muted">An intelligent traffic-control system collects data from road sensors, surveillance cameras and traffic signals. Incoming traffic information is queued for analysis, while signal-control tasks compete for CPU time and memory. Multiple processing tasks may require shared communication channels and monitoring resources.</p>
+      <p><b>Challenge:</b> design a system that processes traffic data efficiently, synchronizes sensor-data production and consumption, manages memory for incoming data, and ensures safe resource allocation.</p>
+    </div>
+    <div class="card">
+      <div class="card-h">Quick start</div>
+      <details class="acc" open><summary>Run the whole city</summary>Open <b>Live City</b>, press <b>Play</b>, then try the scenario presets (Rush hour, Emergency vehicle, Sensor storm, Memory starved) and watch the right-hand panels react.</details>
+      <details class="acc"><summary>Explore one algorithm</summary>Each module tab has editable inputs, step-by-step animation, and a speed slider. Press <b>Step</b> to advance one unit at a time.</details>
+      <details class="acc"><summary>Switch theme</summary>Use the sun/moon button in the top bar; the choice is remembered.</details>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ JS-rendered tabs ============================ -->
+<section class="tab" id="tab-live"></section>
+<section class="tab" id="tab-cpu"></section>
+<section class="tab" id="tab-pc"></section>
+<section class="tab" id="tab-bankers"></section>
+<section class="tab" id="tab-memory"></section>
+
+<!-- ================================= THEORY ================================= -->
+<section class="tab theory" id="tab-theory">
+  <div class="grid g2">
+    <div class="card">
+      <h3>1 · CPU Scheduling</h3>
+      <p>The CPU scheduler decides which ready process runs next. With one processor and many tasks, the policy determines how long each task waits and how responsive the system feels.</p>
+      <h4>Metrics</h4>
+      <span class="formula">Turnaround = Completion − Arrival<br>Waiting = Turnaround − Burst<br>Response = First run − Arrival</span>
+      <h4>Algorithms</h4>
+      <ul>
+        <li><b>FCFS</b> — run in arrival order; simple, but short tasks queue behind long ones (convoy effect).</li>
+        <li><b>SJF / SRTF</b> — shortest (remaining) burst first; minimum average waiting time, risk of starving long tasks.</li>
+        <li><b>Priority</b> — lowest number = most urgent; preemptive variant interrupts a running task. Aging avoids starvation.</li>
+        <li><b>Round Robin</b> — fixed time quantum, circular queue; fair and responsive, more context switches.</li>
+      </ul>
+      <div class="callout"><b>In the traffic system:</b> an <i>emergency-vehicle preemption</i> task must run before routine report generation, so priority scheduling is natural; Round Robin keeps camera analytics from starving sensor aggregation.</div>
+    </div>
+    <div class="card">
+      <h3>2 · Process Synchronization — Producer–Consumer</h3>
+      <p>Producers insert items into a shared bounded buffer; consumers remove them. Without coordination, threads may overwrite unread data, read empty slots, or corrupt the buffer indices (a race condition).</p>
+      <h4>Semaphore solution</h4>
+      <span class="formula">empty = N (free slots)   full = 0 (filled slots)   mutex = 1<br>
+Producer: wait(empty) → wait(mutex) → insert → signal(mutex) → signal(full)<br>
+Consumer: wait(full) → wait(mutex) → remove → signal(mutex) → signal(empty)</span>
+      <ul>
+        <li><b>empty / full</b> counting semaphores block producers on a full buffer and consumers on an empty one.</li>
+        <li><b>mutex</b> gives mutual exclusion over the buffer pointers.</li>
+        <li><b>Order matters:</b> taking <code>mutex</code> <i>before</i> <code>empty</code>/<code>full</code> can deadlock — a sleeper holds the lock the other side needs. The simulator has a switch to demonstrate this.</li>
+      </ul>
+      <div class="callout"><b>In the traffic system:</b> loop detectors and cameras are producers of data packets; analytics workers are consumers. The buffer absorbs bursts, and back-pressure (a blocked sensor) is visible when the CPU cannot keep up.</div>
+    </div>
+    <div class="card">
+      <h3>3 · Deadlock Avoidance — Banker's Algorithm</h3>
+      <p>Deadlock needs mutual exclusion, hold-and-wait, no preemption and circular wait. <i>Avoidance</i> lets the OS grant a request only if the resulting state is <b>safe</b>: some order exists in which every process can finish.</p>
+      <h4>Data structures (n processes, m resource types)</h4>
+      <span class="formula">Available[m]  Max[n][m]  Allocation[n][m]<br>Need[i][j] = Max[i][j] − Allocation[i][j]</span>
+      <h4>Safety algorithm</h4>
+      <ul>
+        <li>Work = Available; Finish[i] = false for all i.</li>
+        <li>Find i with Finish[i] = false and Need[i] ≤ Work. If none → go to the last step.</li>
+        <li>Work += Allocation[i]; Finish[i] = true; repeat.</li>
+        <li>If all Finish[i] are true the state is safe, and the order found is a <b>safe sequence</b>.</li>
+      </ul>
+      <h4>Resource-request algorithm</h4>
+      <p>Request ≤ Need? Request ≤ Available? Then <i>pretend</i> to allocate and run the safety algorithm; grant only if safe, otherwise make the process wait.</p>
+      <div class="callout"><b>In the traffic system:</b> communication channels, camera decoders and signal-controller links are shared by analytics tasks. Two camera tasks each holding one decoder and needing another would deadlock — Banker's refuses the second admission.</div>
+    </div>
+    <div class="card">
+      <h3>4 · Memory Management</h3>
+      <p>Contiguous allocation gives each process one block of main memory. The OS tracks free holes and chooses one for every request.</p>
+      <h4>Partitioning</h4>
+      <ul>
+        <li><b>Fixed</b> — memory pre-divided into blocks; one process per block; wastes space <i>inside</i> a block (<b>internal fragmentation</b>).</li>
+        <li><b>Variable (dynamic)</b> — blocks are carved to the exact request size; freed neighbours merge; leaves scattered holes (<b>external fragmentation</b>).</li>
+      </ul>
+      <h4>Placement strategies</h4>
+      <ul>
+        <li><b>First Fit</b> — first hole big enough: fast.</li>
+        <li><b>Best Fit</b> — smallest hole big enough: tiny leftovers, slower search.</li>
+        <li><b>Worst Fit</b> — largest hole: leftovers stay usable, but big holes vanish quickly.</li>
+      </ul>
+      <span class="formula">Internal = block size − process size<br>External = total free − largest hole   (free space unusable for a large request)</span>
+      <p>Compaction slides allocated blocks together to merge all holes into one.</p>
+      <div class="callout"><b>In the traffic system:</b> every analysis task needs a working buffer (sensor window, camera frame cache). If no hole is big enough, the task waits even though enough <i>total</i> memory is free — fragmentation in action.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <h3>How the four mechanisms work together</h3>
+    <ol>
+      <li><b>Producers → buffer (synchronization).</b> Each sensor/camera creates a packet and inserts it with <code>wait(empty) · wait(mutex)</code>. If the buffer is full the sensor blocks — back-pressure.</li>
+      <li><b>Consumers → tasks.</b> An idle analytics worker removes a packet and creates an OS task whose burst, priority and memory need depend on the packet (emergency &gt; sensor &gt; camera).</li>
+      <li><b>Memory management.</b> The task asks for a block using the chosen fit strategy. No hole ⇒ it waits in the admission queue.</li>
+      <li><b>Banker's algorithm.</b> The task declares its maximum claim on channels, decoders and signal links and requests them in two stages. A request that would leave an unsafe state is delayed, so the system never deadlocks.</li>
+      <li><b>CPU scheduling.</b> Admitted tasks enter the ready queue; the scheduler picks one per time unit. Completed tasks release memory and resources and update the signal controller.</li>
+      <li><b>Feedback.</b> Fresher analysis → better green times and emergency preemption → shorter queues → different sensor readings. A slow OS pipeline therefore directly costs drivers time.</li>
+    </ol>
+  </div>
+</section>
+</main>
+
+<footer>
+  <b>TrafficOS</b> — OS Algorithm Visualizer · Smart Traffic Management System<br>
+  Ishika Burde · UID 24003146 · Batch B1 · Operating Systems, 5th Sem (Sec B) · Individual submission
+</footer>
+
+<script src="js/core.js"></script>
+<script src="js/common.js"></script>
+<script src="js/mod-cpu.js"></script>
+<script src="js/mod-pc.js"></script>
+<script src="js/mod-bankers.js"></script>
+<script src="js/mod-memory.js"></script>
+<script src="js/mod-live.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

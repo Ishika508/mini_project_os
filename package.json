@@ -1,0 +1,11 @@
+{
+  "name": "trafficos-os-visualizer",
+  "version": "1.0.0",
+  "description": "OS Algorithm Visualizer — Smart Traffic Management System (CPU scheduling, producer-consumer, Banker's algorithm, memory management)",
+  "author": "Ishika Burde (UID 24003146, Batch B1)",
+  "license": "MIT",
+  "scripts": {
+    "test": "node tests/core.test.js",
+    "start": "python3 -m http.server 8080"
+  }
+}
